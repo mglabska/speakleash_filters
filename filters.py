@@ -5,7 +5,7 @@ import pickle
 
 from speakleash import Speakleash
 
-PROJECT = "europeana_eu_pl_corpus"
+PROJECT = "project_gutenberg_pl_corpus"
 def get_data(ds):
     lst1 = []
     for doc in ds:
@@ -20,36 +20,36 @@ def get_data(ds):
 
 
 def get_filtered(df):
-    mask_cc = {'LOW': df['camel_case'] > 10, 'HIGH': df['camel_case'] < 1}
-    mask_cw = {'LOW': df['capitalized_words_ratio'] > 0.1, 'HIGH': df['capitalized_words_ratio'] < 0.1}
+    mask_cc = {'LOW': df['camel_case'] > 10, 'HIGH': df['camel_case'] < 3}
+    mask_cw = {'LOW': df['capitalized_words_ratio'] > 0.4, 'HIGH': df['capitalized_words_ratio'] < 0.1}
     mask_punct = {
-        'LOW': (df['punctuations_ratio'] > 0.3) | (df['punctuations_ratio'] < 0.15),
-        'HIGH': (df['punctuations_ratio'] > 0.2) & (df['punctuations_ratio'] < 0.3)
+        'LOW': (df['punctuations_ratio'] > 0.4) | (df['punctuations_ratio'] < 0.15),
+        'HIGH': (df['punctuations_ratio'] > 0.1) & (df['punctuations_ratio'] < 0.3)
     }
-    mask_symb = {'LOW': df['symbols_ratio'] > 0.01,'HIGH': df['symbols_ratio'] < 0.01}
+    mask_symb = {'LOW': df['symbols_ratio'] > 0.02,'HIGH': df['symbols_ratio'] < 0.01}
     mask_word = {
         'LOW': (df['avg_word_length'] > 8) | (df['avg_word_length'] < 3),
         'HIGH': (df['avg_word_length'] > 4) & (df['avg_word_length'] < 7)
     }
 
 
-    mask_num = {'LOW': df['pos_num_ratio'] > 0.05, 'HIGH': df['pos_num_ratio'] < 0.03}
-    mask_oovs = {'LOW': df['oovs_ratio'] > 0.1,  'HIGH': df['oovs_ratio'] < 0.06}
+    mask_num = {'LOW': df['pos_num_ratio'] > 0.1, 'HIGH': df['pos_num_ratio'] < 0.05}
+    mask_oovs = {'LOW': df['oovs_ratio'] > 0.1,  'HIGH': df['oovs_ratio'] < 0.05}
     mask_stop = {
         'LOW': (df['stopwords_ratio'] > 0.5) | (df['stopwords_ratio'] < 0.1),
-        'HIGH': (df['stopwords_ratio'] > 0.2) & (df['stopwords_ratio'] < 0.45)
+        'HIGH': (df['stopwords_ratio'] > 0.2) & (df['stopwords_ratio'] < 0.4)
     }
-    mask_x = {'LOW': df['pos_x_ratio'] > 0.1, 'HIGH': df['pos_x_ratio'] < 0.1}
+    mask_x = {'LOW': df['pos_x_ratio'] > 0.05, 'HIGH': df['pos_x_ratio'] < 0.01}
 
 
     mask_dens = {
         'LOW': (df['lexical_density'] > 0.8) | (df['lexical_density'] < 0.3),
-        'HIGH': (df['lexical_density'] < 0.65) & (df['lexical_density'] > 0.4)
+        'HIGH': (df['lexical_density'] < 0.7) & (df['lexical_density'] > 0.4)
     }
-    mask_fog = {'LOW': df['gunning_fog'] > 12, 'HIGH': df['gunning_fog'] < 11}
+    mask_fog = {'LOW': df['gunning_fog'] > 12, 'HIGH': df['gunning_fog'] < 9}
     mask_sent = {
-        'LOW': (df['avg_sentence_length'] > 25) | (df['avg_sentence_length'] < 12),
-        'HIGH': (df['avg_sentence_length'] > 12) & (df['avg_sentence_length'] < 20)
+        'LOW': (df['avg_sentence_length'] > 25) | (df['avg_sentence_length'] < 3),
+        'HIGH': (df['avg_sentence_length'] > 5) & (df['avg_sentence_length'] < 20)
     }
 
     quality_format_low = df.index[mask_symb['LOW'] | mask_punct['LOW'] | mask_cc['LOW'] | mask_cw['LOW'] | mask_word['LOW']]
@@ -71,7 +71,7 @@ def get_filtered(df):
     )
 
 if __name__ == "__main__":
-    base_dir = os.path.join(os.path.dirname(PROJECT))
+    base_dir = os.path.join(os.path.dirname("C:\\Users\\mglab\\SpeakLeash\\datasets\\"))
     replicate_to = os.path.join(base_dir, PROJECT)
     sl = Speakleash(replicate_to)
     ds = sl.get(PROJECT).ext_data
