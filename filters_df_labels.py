@@ -76,7 +76,7 @@ def get_score(x, scores):
 
 
 if __name__ == "__main__":
-    base_dir = os.path.join(os.path.dirname("C:\\Users\\mglab\\SpeakLeash\\datasets\\"))
+    base_dir = os.path.join(os.path.dirname(PROJECT))
     replicate_to = os.path.join(base_dir, PROJECT)
     sl = Speakleash(replicate_to)
     ds = sl.get(PROJECT).ext_data
@@ -84,5 +84,5 @@ if __name__ == "__main__":
     scores = get_filtered(df)
     df['score'] = df.index.tolist()
     df['score'] = df['score'].apply(lambda x: get_score(x, scores))
-    with open(f"C:\\Users\\mglab\\SpeakLeash\\datasets\\{PROJECT}.pkl", "wb") as f:
+    with open(f"{PROJECT}.pkl", "wb") as f:
         pickle.dump(df, f)
