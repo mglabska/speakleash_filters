@@ -1,28 +1,41 @@
+# This function takes dataset name and returns boolean value: True or False for a single document
+
+# - True = document format correct (mostly)
+# - False = document format incorrect
+
+# The results are added to the meta dictionary in a file manifest
 import os
-
-
 from speakleash import Speakleash
 
-PROJECT = "thesis"
+PROJECT: str = "thesis"
 
-def sanity_check(meta):
+
+# Checking, if the manifest contains all required keys
+# temp_meta is the very first dictionary, downloaded from SpeakLeash file manifest
+def sanity_check(temp_meta: dict):
     return all(
-        key in meta.keys() for key in [
-        'camel_case',
-        'punctuations',
-        'symbols',
-        'oovs',
-        'pos_x',
-    ]
+        key in temp_meta.keys() for key in [
+            'camel_case',  # camelWords or CamelWords in the document
+            'punctuations',  # number of punctuation marks
+            'symbols',  # number of symbols
+            'oovs',  # number of words out of vocabulary
+            'pos_x',  # number of words of unidentified part-of-speach
+        ]
     )
 
-def get_data(temp_meta):
+
+# Converting temporary variable: values to ratios (as more interpretable than quantity values).
+# We don't need ratios for CamelCase though, because CC words are mostly incorrect according to Polish spelling rules
+def get_data(temp_meta: dict):
     keys = ['punctuations', 'symbols', 'oovs', 'pos_x']
     for key in keys:
         temp_meta[f'{key}_ratio'] = temp_meta[f'{key}'] / temp_meta['words']
-    return temp_meta
+    return temp_meta  # meta dict for further processing
 
-def get_filtered(meta):
+
+# Filters for True/False value:
+# mask variables contain filters for specific values of meta parameters in a dictionary
+def get_filtered(meta: dict):
     mask_cc = {'LOW': meta['camel_case'] > 10, 'HIGH': meta['camel_case'] < 3}
     mask_punct = {
         'LOW': (meta['punctuations_ratio'] > 0.4) | (meta['punctuations_ratio'] < 0.1),
@@ -34,30 +47,34 @@ def get_filtered(meta):
     mask_x = {'LOW': meta['pos_x_ratio'] > 0.07, 'HIGH': meta['pos_x_ratio'] < 0.01}
 
     if (
-                mask_symb['LOW'] | mask_punct['LOW'] | mask_cc['LOW']
-        ):
-        return 'format_correct: False'
+                mask_symb['LOW'] | mask_punct['LOW'] | mask_cc['LOW']  # checking for non-alphanumeric values and typos
+    ):
+        return 'format_correct: False'  # 'LOW' means that the format is incorrect, hence False
     elif (
-                mask_x['LOW'] & mask_oovs['LOW']
-        ):
-        return 'format_correct: False'
+                mask_x['LOW'] & mask_oovs['LOW']  # checking for unknown part-of-speech or words out of vocabulary
+    ):
+        return 'format_correct: False'  # 'LOW' means that there is something wrong with the text, hence False
     else:
         return 'format_correct: True'
-    
+
+
+# Final function, combining all above:
+# adding another key-value pair ('quality': -> boolean) to the meta dictionary in a file manifest
 def get_quality(meta):
     temp_meta = meta
     temp_meta = get_data(temp_meta)
     temp_meta['quality'] = get_filtered(temp_meta)
     meta['quality'] = temp_meta['quality']
+    print(meta)
     return meta
 
 
 if __name__ == "__main__":
-    base_dir = os.path.join(os.path.dirname(PROJECT))
+    base_dir = os.path.join(os.path.dirname(PROJECT))  # standard dataset downloading
     replicate_to = os.path.join(base_dir, PROJECT)
     sl = Speakleash(replicate_to)
     ds = sl.get(PROJECT).ext_data
-    for doc in ds:
-        _, meta = doc
-        sanity_check(meta)
-        get_quality(meta)
+    for doc in ds:  # iteration through all documents in a given dataset
+        _, meta1 = doc
+        sanity_check(meta1)
+        get_quality(meta1)
