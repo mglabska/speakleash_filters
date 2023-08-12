@@ -1,4 +1,4 @@
-# This function takes dataset name and returns boolean value: True or False for a single document
+# This function takes the dataset name and returns a boolean value: True or False for a single document
 
 # - True = document format correct (mostly)
 # - False = document format incorrect
@@ -11,7 +11,7 @@ PROJECT: str = "thesis"
 
 
 # Checking, if the manifest contains all required keys
-# meta is the very first dictionary, downloaded from SpeakLeash file manifest
+# meta is the very first dictionary, downloaded from the SpeakLeash file manifest
 def sanity_check(meta: dict):
     return all(
         key in meta.keys() for key in [
@@ -19,7 +19,7 @@ def sanity_check(meta: dict):
             'punctuations',  # number of punctuation marks
             'symbols',  # number of symbols
             'oovs',  # number of words out of vocabulary
-            'pos_x',  # number of words of unidentified part-of-speach
+            'pos_x',  # number of words of unidentified part-of-speech
         ]
     )
 
@@ -34,7 +34,7 @@ def get_data(meta: dict):
 
 
 # Filters for True/False value:
-# mask variables contain filters for specific values of meta parameters in a dictionary
+# Mask variables contain filters for specific values of meta parameters in a dictionary
 def get_filtered(meta: dict):
     mask_cc = {'LOW': meta['camel_case'] > 10, 'HIGH': meta['camel_case'] < 3}
     mask_punct = {
@@ -59,9 +59,9 @@ def get_filtered(meta: dict):
 
 
 # Final function, combining all above:
-# adding another key-value pair ('quality': -> boolean) to the meta dictionary in a file manifest
+# Adding another key-value pair ('quality': -> boolean) to the meta dictionary in a file manifest
 def get_quality(meta):
-    temp_meta = meta  # Creating temporary variable for calculation
+    temp_meta = meta  # Creating a temporary variable for calculation
     temp_meta = get_data(temp_meta)
     temp_meta['quality'] = get_filtered(temp_meta)
     meta['quality'] = temp_meta['quality']  # Returning results to the original meta dictionary
