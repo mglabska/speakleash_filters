@@ -1,6 +1,6 @@
-# This function takes dataset name and returns a dictionary with
+# This function takes the dataset name and returns a dictionary with
 # - document indices as keys
-# -  list of code samples and urls as values
+# - list of code samples and urls as values
 
 # The results are printed out
 
