@@ -11,10 +11,10 @@ PROJECT: str = "thesis"
 
 
 # Checking, if the manifest contains all required keys
-# temp_meta is the very first dictionary, downloaded from SpeakLeash file manifest
-def sanity_check(temp_meta: dict):
+# meta is the very first dictionary, downloaded from SpeakLeash file manifest
+def sanity_check(meta: dict):
     return all(
-        key in temp_meta.keys() for key in [
+        key in meta.keys() for key in [
             'camel_case',  # camelWords or CamelWords in the document
             'punctuations',  # number of punctuation marks
             'symbols',  # number of symbols
@@ -24,13 +24,13 @@ def sanity_check(temp_meta: dict):
     )
 
 
-# Converting temporary variable: values to ratios (as more interpretable than quantity values).
+# Creating temporary variable: values to ratios (as more interpretable than quantity values).
 # We don't need ratios for CamelCase though, because CC words are mostly incorrect according to Polish spelling rules
-def get_data(temp_meta: dict):
+def get_data(meta: dict):
     keys = ['punctuations', 'symbols', 'oovs', 'pos_x']
     for key in keys:
-        temp_meta[f'{key}_ratio'] = temp_meta[f'{key}'] / temp_meta['words']
-    return temp_meta  # meta dict for further processing
+        meta[f'{key}_ratio'] = meta[f'{key}'] / meta['words']
+    return meta  # meta dict for further processing
 
 
 # Filters for True/False value:
@@ -61,10 +61,11 @@ def get_filtered(meta: dict):
 # Final function, combining all above:
 # adding another key-value pair ('quality': -> boolean) to the meta dictionary in a file manifest
 def get_quality(meta):
-    temp_meta = meta
+    temp_meta = meta  # Creating temporary variable for calculation
     temp_meta = get_data(temp_meta)
     temp_meta['quality'] = get_filtered(temp_meta)
-    meta['quality'] = temp_meta['quality']
+    meta['quality'] = temp_meta['quality']  # Returning results to the original meta dictionary
+
     print(meta)
     return meta
 
