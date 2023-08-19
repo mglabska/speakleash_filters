@@ -40,7 +40,7 @@ class MinHashDF:
         return frame
 
     @staticmethod
-    def get_similar(df):  # function searching for duplicates chunk by chunk
+    def get_similar(df):
         sim_list = []
         with progressbar.ProgressBar(max_value=len(df['text'])) as bar:  # monitoring the progress
             corpus = df['text'].values
